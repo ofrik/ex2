@@ -4,6 +4,8 @@ library(ggmap)
 library(ggplot2)
 library(Hmisc)
 
+#http://earthquake.usgs.gov/earthquakes/feed/v1.0/glossary.php
+
 # data fetch
 URL <- "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv"
 Earthquake_30Days <- read.table(URL, sep = ",", header = T)
@@ -11,6 +13,15 @@ Earthquake_30Days <- read.table(URL, sep = ",", header = T)
 # exploration
 head(Earthquake_30Days)
 describe(Earthquake_30Days)
+
+drops <- c("nst","gap","dmin","magError","magNst")
+dataClean <- Earthquake_30Days[, !(names(Earthquake_30Days) %in% drops)]
+dataClean<-dataClean[complete.cases(dataClean),]
+dataClean <- dataClean[dataClean$type=="earthquake",]
+
+
+boxplot(mag~net,data=dataClean,col="red")
+boxplot(Earthquake_30Days)
 
 #data description
 

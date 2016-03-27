@@ -8,51 +8,87 @@ knitr::opts_chunk$set(echo = TRUE)
 library(ggmap)
 library(ggplot2)
 library(Hmisc)
+library(caret)
 URL <- "http://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_month.csv"
 Earthquake_30Days <- read.table(URL, sep = ",", header = T)
-```
+```  
+
 ## Data Exploration:
 ### lets check the head of the dataset
 ```{r echo=FALSE}
 head(Earthquake_30Days)
-```
+```  
+
 as we can see we have 2 datetime columns 12 numeric columns and 8 textual columns  
 one of the important things we can see is that we have missing values  
 
 ### lets explore some data statistics
 ```{r echo=FALSE}
 describe(Earthquake_30Days)
-```
+```  
+
 we can see there are some columns that contains many missing values such as 'nst', 'gap', 'dmin, 'magError' and 'magNst' 
 i will omit those columns and remove rows with missing data on the rest of the data so i can have clean data to work with and also filter the non earthquake records
+
 ```{r echo=FALSE}
 drops <- c("nst","gap","dmin","magError","magNst")
 dataClean <- Earthquake_30Days[, !(names(Earthquake_30Days) %in% drops)]
 dataClean <- dataClean[complete.cases(dataClean),]
 dataClean <- dataClean[dataClean$type=="earthquake",]
-```
+```  
 
 
 ## Data Description:
 the data is about earthquakes telemetry which includes the location of the activity, the manitude, depth etc.  
-as i see it the most relevant data attributes are the location represented by latitude and longtitude, the manitude, depth and rms(the root mean square of the travel time residual) and the location source.  
+as i see it the most relevant data attributes are the location represented by latitude and longitude, the manitude, depth and rms(the root mean square of the travel time residual) and the location source.  
 i will explore the relation of those attributes  
 
 ## Data Analysis:
 
 ### check correlation in the data columns
+```{r echo=FALSE}
+numCols <- c("mag","rms","depth","horizontalError","depthError","latitude","longitude")
+corMatrix <- cor(dataClean[,names(dataClean) %in% numCols])
+corMatrix
+```  
+we can see that the rms and magnitude have the highest correlation which we could expect because it make sense that big earthquakes will move faster or be noticed faster then small ones.  
+but still none of the correlation can be addressed as something out of the ordinary  
 
-### graphs of the more "relevant" columns and compared to each other
+### graphs of the more "relevant" columns and compared to each other  
+let look at some of the magnitude statistics we can see that the median is about 1 and the variance is lower then 2  
+so we can conclude that most of the earthquakes aren't noticable 
+```{r echo=FALSE}
+boxplot(dataClean$mag,col="red")
+```  
 
-### trend i see in the graphs
+lets look on who first reported the events based on the magnitude  
+```{r echo=FALSE}
+boxplot(mag~locationSource,data=dataClean,col="red")
+```  
+
+we can see the the us station reported the strongest event and has one of the highest median of the events magnitude which is alot higher then the global median of the magnitude.  
+
+let's look at location colusters of earthquakes  
+```{r echo=FALSE}
+with(dataClean,plot(longitude,latitude))
+```  
+
+we can see several of clusters in the top left of the map. let look which place is that.  
+```{r echo=FALSE,message=FALSE,warning=FALSE}
+map <- get_map(location = c(lon = -125, lat = 50), zoom = 3,maptype = "satellite", scale = 2)
+ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+```  
+
+we can see it's north america around san fransisco which is known for it's earthquakes  
+
+```{r echo=FALSE,message=FALSE,warning=FALSE}
+map <- get_map(location = c(lon = 130, lat = 0), zoom = 3,maptype = "satellite", scale = 2)
+ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+```  
+
+also we can see that most of the earthquakes are focused around the "ring of fire" which is around the pacific ocean and known to be with alot of earthquakes and active volcanoes.  
+event thought there are alot of earthquakes in north america it looks like the more aggressive ones are in south-east asia
 
 ### try to do regression on some of the columns
-
-## Map/s from the data:
-```{r echo=FALSE,message=FALSE,warning=FALSE}
-map <- get_map(location = c(lon = mean(Earthquake_30Days$longitude), lat = mean(Earthquake_30Days$latitude)), zoom = 3,maptype = "satellite", scale = 2)
-ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
-```
-in the map we can see that most of the earthquakes are in the bounderies between continents and espacially in the "ring of fire" which is around the pacific ocean  
 
 ## Summary and Recommendations:

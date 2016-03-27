@@ -76,19 +76,38 @@ with(dataClean,plot(longitude,latitude))
 we can see several of clusters in the top left of the map. let look which place is that.  
 ```{r echo=FALSE,message=FALSE,warning=FALSE}
 map <- get_map(location = c(lon = -125, lat = 50), zoom = 3,maptype = "satellite", scale = 2)
-ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+ggmap(map) + geom_point(data = dataClean, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
 ```  
 
 we can see it's north america around san fransisco which is known for it's earthquakes  
-
 ```{r echo=FALSE,message=FALSE,warning=FALSE}
 map <- get_map(location = c(lon = 130, lat = 0), zoom = 3,maptype = "satellite", scale = 2)
-ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+ggmap(map) + geom_point(data = dataClean, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
 ```  
 
 also we can see that most of the earthquakes are focused around the "ring of fire" which is around the pacific ocean and known to be with alot of earthquakes and active volcanoes.  
 event thought there are alot of earthquakes in north america it looks like the more aggressive ones are in south-east asia
 
-### try to do regression on some of the columns
+let look at the relation of magnitude and RMS  
+```{r echo=FALSE}
+plot(dataClean$mag,dataClean$rms)
+```
+
+we can see a trend up in the RMS as the earthquake was stronger as we expect  
+
+let look as the relation of magnitude and the depth of the event  
+```{r echo=FALSE}
+plot(dataClean$mag,dataClean$depth)
+```
+
+here we can see something interesting, only earthquakes with magnitude of 4+ has been in big depth which indicate more massive or aggressive movment of the continents  
+
+lets check if there is some hour where earthquakes occure more frequently  
+```{r echo=FALSE}
+hoursData <- as.numeric(format(strptime(dataClean$time, "%Y-%m-%dT%H:%M:%S"),format = '%H'))
+hist(hoursData)
+```
+
+we can see that around midnight there are little more earthquakes  
 
 ## Summary and Recommendations:

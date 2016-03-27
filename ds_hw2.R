@@ -38,8 +38,15 @@ boxplot(mag~locationSource,data=dataClean,col="red")
 with(dataClean,plot(longitude,latitude))
 
 map <- get_map(location = c(lon = -125, lat = 50), zoom = 3,maptype = "satellite", scale = 2)
-ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
-
+ggmap(map) + geom_point(data = dataClean, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
 
 map <- get_map(location = c(lon = 130, lat = 0), zoom = 3,maptype = "satellite", scale = 2)
-ggmap(map) + geom_point(data = Earthquake_30Days, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+ggmap(map) + geom_point(data = dataClean, aes(x = longitude, color = mag,y = latitude, alpha = 0.1), size = 2, shape = 21) +  guides(fill=FALSE, alpha=FALSE, size=FALSE) + scale_color_gradient(low="yellow", high="red")
+
+plot(dataClean$mag,dataClean$rms)
+plot(dataClean$mag,dataClean$depth)
+
+
+hoursData <- as.numeric(format(strptime(dataClean$time, "%Y-%m-%dT%H:%M:%S"),format = '%H'))
+hist(hoursData)
+

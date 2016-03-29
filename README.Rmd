@@ -111,3 +111,12 @@ hist(hoursData)
 we can see that around midnight there are little more earthquakes  
 
 ## Summary and Recommendations:
+
+my conclusions are that it seems like there are some stations that reports on more events the others, maybe they have better technology.  
+most of the earthquakes are in the "ring of fire" and they're the most severe ones.  
+the stronger the magnitude the faster it travels which we can see in the RMS vs. magnitude scatter plot.  
+events with deep source are mostly with pretty high magnitude probably because of significant movment of the continents.  
+  
+as for my recommendations for further research i suggest to:  
+- try to predict sequence of events or maybe to look for casual relation between events that occurred in a small timeframe.  
+- try to compare previous events and look for seasional trends and/or increase/decrease in the frequency of events
